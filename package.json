@@ -1,0 +1,12 @@
+{
+  "name": "grading-region",
+  "version": "1.0.0",
+  "private": true,
+  "description": "지방기능경기대회 모바일앱개발 채점 결과 조회 사이트 (관리자 PC 전용 Node 서버 + GitHub Pages 정적 배포)",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
