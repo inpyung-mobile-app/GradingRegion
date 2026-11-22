@@ -1,10 +1,21 @@
 {
-  "updatedAt": "2026-11-22T02:23:32.390Z",
+  "updatedAt": "2026-11-22T22:45:16.590Z",
   "items": [
     {
       "id": "2efbdf9149fd",
       "name": "이영재",
       "addedAt": "2026-11-22T02:23:32.378Z",
+      "max": 35,
+      "total": 28,
+      "subjective": 4.3,
+      "objective": 23.7,
+      "deduction": 7,
+      "target": "026-reg-hsu"
+    },
+    {
+      "id": "5362e3fce157",
+      "name": "유현서",
+      "addedAt": "2026-11-22T22:45:16.590Z",
       "max": 35,
       "total": 28,
       "subjective": 4.3,
