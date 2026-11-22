@@ -56,7 +56,11 @@
   async function viewMain() {
     logoutBtn.hidden = false;
     let data;
-    try { data = await api('/api/reviews'); } catch (e) { if (e.status === 401) return viewLogin(); throw e; }
+    try { data = await api('/api/reviews'); } catch (e) {
+      if (e.status === 401) return viewLogin();
+      root.replaceChildren(h('div', { class: 'card sec', style: 'margin-top:40px' }, h('h2', null, '목록을 불러오지 못했어요'), h('p', { class: 'desc' }, e.message || '서버에 연결할 수 없어요. 터미널에서 서버가 켜져 있는지 확인해 주세요.'), h('button', { class: 'btn', type: 'button', onclick: viewMain }, '다시 시도')));
+      return;
+    }
     picked = null;
     root.replaceChildren(addSection(data.items), listSection(data.items), publishSection());
   }
@@ -137,7 +141,9 @@
       async function submit(replace = false) {
         const name = nameIn.value.trim();
         if (!name) { msg.className = 'msg err'; msg.textContent = '이름을 입력해 주세요.'; nameIn.focus(); return; }
-        const dup = existing.find((x) => x.name.normalize('NFC').replace(/\s+/g, '') === name.normalize('NFC').replace(/\s+/g, ''));
+        // 서버(normName)와 같은 기준으로 비교한다: NFC, 공백 무시, 대소문자 무시
+        const key = (s) => s.normalize('NFC').replace(/\s+/g, '').toLowerCase();
+        const dup = existing.find((x) => key(x.name) === key(name));
         if (dup && !replace && !confirm(`'${dup.name}' 은(는) 이미 등록돼 있어요. 새 채점지로 바꿀까요?`)) return;
         go.disabled = true; prog.hidden = false; msg.className = 'msg'; msg.textContent = '업로드 중…';
         let uploadId = null;

@@ -62,14 +62,18 @@
   function matchName(name, query) {
     const nq = queryOf(query);
     if (!nq) return null;
+    // 이름 속 공백("김 민수")은 무시하고 비교하되, 강조 표시는 원래 위치로 되돌린다
     const nn = norm(name);
-    let i = nn.indexOf(nq);
-    if (i >= 0) return [i, nq.length];
-    if (/^[ㄱ-ㅎ]+$/.test(nq)) {
-      i = cho(nn).indexOf(nq);
-      if (i >= 0) return [i, nq.length];
+    let s = '';
+    const pos = [];
+    for (let k = 0; k < nn.length; k++) {
+      if (/\s/.test(nn[k])) continue;
+      s += nn[k]; pos.push(k);
     }
-    return null;
+    let i = s.indexOf(nq);
+    if (i < 0 && /^[ㄱ-ㅎ]+$/.test(nq)) i = cho(s).indexOf(nq);
+    if (i < 0) return null;
+    return [pos[i], pos[i + nq.length - 1] - pos[i] + 1];
   }
   function highlight(name, m) {
     if (!m) return name;
@@ -77,11 +81,13 @@
   }
 
   /* ---------- 데이터 ---------- */
+  let rankedCount = 0; // 점수가 있는 응시자 수 (순위는 점수가 있는 사람만 매긴다)
   function computeRanks() {
-    const sorted = [...items].sort((a, b) => (b.total ?? -1) - (a.total ?? -1));
+    const scored = items.filter((x) => x.total != null).sort((a, b) => b.total - a.total);
     rankOf = new Map();
+    rankedCount = scored.length;
     let prev = null; let rank = 0;
-    sorted.forEach((it, i) => {
+    scored.forEach((it, i) => {
       if (it.total !== prev) { rank = i + 1; prev = it.total; }
       rankOf.set(it.id, rank);
     });
@@ -213,7 +219,7 @@
     refs.count.textContent = items.length ? `총 ${items.length}명 · ${MAX.total}점 만점` : '';
   }
 
-  function meCard(it, m) {
+  function meCard(it, m, animate) {
     const rank = rankOf.get(it.id);
     const row = (label, val, max) => {
       const fill = h('div', { class: 'fill', 'data-w': pct(val, max).toFixed(1) });
@@ -222,10 +228,10 @@
         h('div', { class: 'track' }, fill),
         h('span', { class: 'val num' }, `${fmt(val)} / ${max}`));
     };
-    return h('a', { class: 'card me rise', href: '#/' + it.id, 'aria-label': `${it.name} 채점 결과 자세히 보기` },
+    return h('a', { class: 'card me' + (animate ? ' rise' : ''), href: '#/' + it.id, 'aria-label': `${it.name} 채점 결과 자세히 보기` },
       h('div', { class: 'me-head' },
         h('span', { class: 'me-name' }, highlight(it.name, m)),
-        h('span', { class: 'me-rank num' }, `${items.length}명 중 ${rank}위`),
+        rank ? h('span', { class: 'me-rank num' }, `${rankedCount}명 중 ${rank}위`) : null,
         h('span', { class: 'me-go' }, '자세히', svg(ICON.right, 18))),
       h('div', { class: 'me-score num' }, h('b', null, fmt(it.total)), h('span', null, `/ ${MAX.total}점`)),
       h('div', { class: 'bars' }, row('주관', it.subjective, MAX.subjective), row('객관', it.objective, MAX.objective)));
@@ -240,14 +246,18 @@
       return;
     }
     const shown = hits.slice(0, 6);
+    // 글자를 한 자 칠 때마다 카드가 다시 나타나는 애니메이션이 반복되지 않도록, 처음 나타날 때만 움직인다
+    const first = !box.querySelector('.me');
     box.classList.toggle('one', shown.length === 1);
     box.replaceChildren(...[
       hits.length > 1 ? h('p', { class: 'found-label' }, `${hits.length}명을 찾았어요`) : null,
-      ...shown.map(([it, m]) => meCard(it, m)),
+      ...shown.map(([it, m]) => meCard(it, m, first)),
       hits.length > shown.length ? h('p', { class: 'found-label' }, `외 ${hits.length - shown.length}명은 아래 전체 결과에서 볼 수 있어요`) : null,
     ].filter(Boolean));
+    const fills = box.querySelectorAll('.fill[data-w]');
+    if (!first) { fills.forEach((f) => { f.style.transition = 'none'; f.style.width = f.dataset.w + '%'; }); return; }
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      box.querySelectorAll('.fill[data-w]').forEach((f) => { f.style.width = f.dataset.w + '%'; });
+      fills.forEach((f) => { f.style.width = f.dataset.w + '%'; });
     }));
   }
 
@@ -262,7 +272,7 @@
       const m = query ? matchName(it.name, query) : null;
       const rank = rankOf.get(it.id);
       const tr = h('tr', { class: m ? 'hit' : '', onclick: (e) => { if (!e.target.closest('a')) location.hash = '#/' + it.id; } },
-        h('td', { class: 'rank num' }, rank <= 1 && it.total != null ? h('span', { class: 'top1', title: '1위' }, '1') : String(rank)),
+        h('td', { class: 'rank num' }, rank == null ? '—' : rank === 1 ? h('span', { class: 'top1', title: '1위' }, '1') : String(rank)),
         h('td', { class: 'name' },
           h('a', { href: '#/' + it.id }, highlight(it.name, m)),
           h('small', { class: 'num' }, `주관 ${fmt(it.subjective)} · 객관 ${fmt(it.objective)}`)),
@@ -344,7 +354,9 @@
             }
           }
         }, true);
-        const fit = () => { frame.style.height = d.documentElement.scrollHeight + 'px'; };
+        // scrollHeight 는 프레임 자기 높이보다 작아질 수 없어서, 화면 폭이 넓어져도 줄지 않는다.
+        // 내용의 실제 높이(html 요소 상자)를 재야 줄어든다.
+        const fit = () => { frame.style.height = Math.ceil(d.documentElement.getBoundingClientRect().height) + 'px'; };
         fit();
         new ResizeObserver(fit).observe(d.documentElement);
       } catch (e) { frame.style.height = '90vh'; }
@@ -357,7 +369,7 @@
       h('div', { class: 'd-grid rise' },
         h('div', { class: 'card d-score' },
           h('div', { class: 'big num' }, h('b', null, fmt(it.total)), h('span', null, `/ ${MAX.total}점`)),
-          h('span', { class: 'me-rank pill num' }, `${items.length}명 중 ${rank}위`)),
+          rank ? h('span', { class: 'me-rank pill num' }, `${rankedCount}명 중 ${rank}위`) : null),
         h('div', { class: 'card d-split' },
           split('주관', it.subjective, MAX.subjective),
           split('객관', it.objective, MAX.objective))),

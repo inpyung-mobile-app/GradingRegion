@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Tarot Module A 채점 리뷰</title>
+<style>
+@font-face{font-family:"NotoKR";src:url("../assets/fonts/NotoSansKR-Regular.ttf");font-weight:400}
+@font-face{font-family:"NotoKR";src:url("../assets/fonts/NotoSansKR-Medium.ttf");font-weight:500}
+@font-face{font-family:"NotoKR";src:url("../assets/fonts/NotoSansKR-Bold.ttf");font-weight:700}
+:root{--bg:#f4f1f9;--card:#fff;--ink:#241b36;--sub:#665d7c;--line:#e4def0;--accent:#5b2a9a;--accent2:#efe7fb;
+--bad:#c62828;--badbg:#fdf0f0;--ok:#2e7d32;--okbg:#eef7ee;--warn:#a85f00;--warnbg:#fff6e5;--code:#efeaf8}
+@media (prefers-color-scheme:dark){:root{--bg:#140e20;--card:#1f1631;--ink:#f0ebf9;--sub:#b3a9c9;--line:#382d52;--accent:#c4a2f7;--accent2:#2d2148;
+--bad:#ff9a9a;--badbg:#38202a;--ok:#86d992;--okbg:#18301e;--warn:#ffc46b;--warnbg:#382c14;--code:#2a2042}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.85 "NotoKR","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;word-break:keep-all}
+.wrap{max-width:900px;margin:0 auto;padding:36px 20px 100px}
+h1{font-size:30px;font-weight:700;line-height:1.35;margin:0 0 6px}
+h2{font-size:24px;font-weight:700;margin:64px 0 18px;padding:0 0 10px;border-bottom:3px solid var(--accent)}
+h3{font-size:18px;font-weight:700;margin:0 0 8px}
+p{margin:6px 0}
+.sub{color:var(--sub);font-size:15px;margin:0 0 22px}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+nav a{padding:6px 14px;border-radius:99px;background:var(--accent2);color:var(--accent);text-decoration:none;font-size:14px;font-weight:500}
+.score{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.box b{display:block;font-size:34px;font-weight:700;line-height:1.2;color:var(--accent)}
+.box span{color:var(--sub);font-size:14px}
+.note{background:var(--warnbg);border-left:5px solid var(--warn);padding:14px 18px;border-radius:8px;margin:18px 0;font-size:15.5px}
+.note ul{margin:8px 0 0}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:15px;line-height:1.6;margin:10px 0}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--code);font-size:14px;font-weight:700}
+td.n,th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+tr.bad td{background:var(--badbg)}tr.part td{background:var(--warnbg)}
+.tag{display:inline-block;padding:1px 10px;border-radius:99px;font-size:13px;font-weight:700;line-height:1.6}
+.tag.bad{background:var(--bad);color:#fff}.tag.ok{background:var(--ok);color:#fff}.tag.part{background:var(--warn);color:#fff}
+.defect{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--bad);border-radius:12px;padding:20px 22px;margin:20px 0;display:grid;grid-template-columns:1fr 210px;gap:22px}
+.defect.warn{border-left-color:var(--warn)}
+.defect h3{font-size:18px;line-height:1.5}
+.defect .pts{display:inline-block;margin-left:6px;color:var(--bad);font-weight:700}
+.defect ul{margin:6px 0}
+.shots{display:flex;gap:10px;flex-direction:column}
+figure{margin:0}figure img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
+figcaption{font-size:13px;color:var(--sub);margin-top:6px;line-height:1.5}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
+code{font-family:Consolas,"D2Coding",monospace;font-size:.88em;background:var(--code);padding:2px 6px;border-radius:5px}
+pre{font-family:Consolas,"D2Coding",monospace;font-size:14px;line-height:1.6;background:var(--code);padding:14px 16px;border-radius:10px;overflow:auto;margin:10px 0}
+.rv{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 26px;margin:18px 0}
+.rv h3{font-size:19px;margin:22px 0 8px}.rv h3:first-child{margin-top:0}
+ul,ol{margin:8px 0;padding-left:22px}li{margin:5px 0}
+details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin:10px 0}
+summary{cursor:pointer;font-size:16px}
+details table{margin:10px 0 4px;font-size:14.5px}
+.order li b{color:var(--accent)}
+@media (max-width:760px){body{font-size:16px}.score{grid-template-columns:repeat(2,1fr)}.defect{grid-template-columns:1fr}.shots{flex-direction:row}.gal{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}}
+</style>
+<style>
+h2,h3{scroll-margin-top:76px}
+.box b span{font-size:inherit;color:inherit}
+#bar{position:fixed;top:0;left:0;height:4px;width:0;background:linear-gradient(90deg,var(--accent),#e08bff);z-index:60;transition:width .1s linear}
+nav{position:sticky;top:0;z-index:40;padding:10px 0;margin:14px 0 8px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);background:color-mix(in srgb,var(--bg) 82%,transparent)}
+nav a{transition:transform .2s,background .25s,color .25s,box-shadow .25s}
+nav a:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(91,42,154,.25)}
+nav a.active{background:var(--accent);color:#fff}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.box{transition:transform .25s,box-shadow .25s,border-color .25s}
+.box:hover{transform:translateY(-5px);box-shadow:0 12px 26px rgba(91,42,154,.22);border-color:var(--accent)}
+table tr{transition:background .2s}
+table tr:hover td{background:var(--accent2)}
+tr.click{cursor:pointer}
+tr.click:hover td:nth-child(2){color:var(--accent);font-weight:700}
+.defect{transition:transform .28s,box-shadow .28s}
+.defect:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(0,0,0,.14)}
+.rv{transition:box-shadow .25s}.rv:hover{box-shadow:0 10px 24px rgba(0,0,0,.1)}
+figure{overflow:hidden;border-radius:10px;cursor:zoom-in}
+figure img{transition:transform .4s cubic-bezier(.2,.8,.2,1),filter .3s}
+figure:hover img{transform:scale(1.06);filter:brightness(1.05)}
+figure figcaption{padding:0 2px 2px}
+.tag{animation:pop .45s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+summary{list-style:none;position:relative;padding-left:26px;transition:color .2s}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸";position:absolute;left:4px;top:0;transition:transform .25s;color:var(--accent)}
+details[open]>summary::before{transform:rotate(90deg)}
+summary:hover{color:var(--accent)}
+details[open]>table{animation:drop .4s ease}
+@keyframes drop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+details.flash{animation:flash 1.4s ease}
+@keyframes flash{0%,100%{box-shadow:0 0 0 0 transparent}30%{box-shadow:0 0 0 6px var(--accent)}}
+.bar{display:inline-block;vertical-align:middle;width:110px;height:10px;border-radius:99px;background:var(--code);overflow:hidden}
+.bar i{display:block;height:100%;width:var(--w);border-radius:99px;background:var(--ok)}
+.bar.part i{background:var(--warn)}.bar.zero i{background:var(--bad)}
+.reveal .bar i{width:0}
+.reveal.in .bar i{width:var(--w);transition:width 1.2s cubic-bezier(.2,.8,.2,1) .25s}
+.pct{margin-left:8px;font-size:13px;color:var(--sub);font-variant-numeric:tabular-nums}
+.filter{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 12px;font-size:14px}
+.filter button{border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:14px;padding:5px 16px;border-radius:99px;cursor:pointer;transition:all .2s}
+.filter button:hover{transform:translateY(-2px);border-color:var(--accent)}
+.filter button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.filter .hint{margin-left:auto;color:var(--sub);font-size:13px}
+.hide{display:none!important}
+#lb{position:fixed;inset:0;z-index:100;background:rgba(12,6,24,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;opacity:0;pointer-events:none;transition:opacity .3s;cursor:zoom-out}
+#lb.on{opacity:1;pointer-events:auto}
+#lb img{max-height:88vh;max-width:92vw;border-radius:12px;transform:scale(.88);transition:transform .35s cubic-bezier(.2,.9,.3,1.2)}
+#lb.on img{transform:none}
+#lb p{color:#fff;margin:0;font-size:15px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}.reveal .bar i{width:var(--w)}}
+</style>
+<style data-gr-font>@font-face{font-family:"Pretendard Variable";src:url("../../assets/fonts/PretendardVariable.woff2") format("woff2-variations");font-weight:45 920;font-display:swap}body{font-family:"Pretendard Variable",Pretendard,"Malgun Gothic",system-ui,sans-serif!important}</style></head>
+<body>
+<div id="bar"></div>
+<div class="wrap">
+
+<h1>Daily Tarot · Module A 채점 리뷰</h1>
+<p class="sub">기준: 2026 지방기능경기대회 모바일앱개발 채점기준(Module A 주관 7점 + 객관 28점 = 35점) · 대상: <code>026-reg-hsu</code> (Flutter) · <code>apk/daily_tarot.apk</code>를 에뮬레이터에서 직접 실행해 확인했다.</p>
+
+<nav><a href="#grade">1 채점 결과</a><a href="#defect">2 감점 요소</a><a href="#proto">2-1 프로토타입 대조</a><a href="#code">3 코드 리뷰</a><a href="#shots">4 전체 캡처</a></nav>
+
+<div class="score">
+  <div class="box"><b><span data-count="28.0" data-dec="1">28.0</span> <small style="font-size:16px">/ 35</small></b><span>Module A 예상 점수</span></div>
+  <div class="box"><b><span data-count="4.3" data-dec="1">4.3</span> <small style="font-size:16px">/ 7</small></b><span>주관</span></div>
+  <div class="box"><b><span data-count="23.7" data-dec="1">23.7</span> <small style="font-size:16px">/ 28</small></b><span>객관</span></div>
+  <div class="box"><b style="color:var(--bad)">−<span data-count="7.0" data-dec="1">7.0</span></b><span>총 감점</span></div>
+</div>
+
+<h2 id="grade">1. A 채점 결과</h2>
+
+<h3>주관 항목 (7점)</h3>
+<table>
+<tr><th>#</th><th>항목</th><th class="n">배점</th><th class="n">등급</th><th class="n">득점</th><th>근거 (프로토타입 대조는 2-1 참고)</th></tr>
+<tr><td>1</td><td>온보딩 화면 프로토타입 일치</td><td class="n">1.0</td><td class="n">3</td><td class="n">0.75</td><td>달·로고·문구·버튼·구름 구성은 같다. 다만 로고와 문구가 프로토타입보다 위에 있고(문구 y 0.37 vs 0.42), 시작하기 버튼이 많이 위에 있으며(0.56 vs 0.64), 첫 화면에 진행 막대가 보인다. 70% 이상 일치로 3등급.</td></tr>
+<tr><td>2</td><td>정보 입력 화면 일치</td><td class="n">1.0</td><td class="n">2</td><td class="n">0.50</td><td>날짜 화면은 요일 줄이 추가되었고, 이전·다음 달의 흐린 날짜와 안내 문구가 없다. 시간 화면은 시계 숫자가 01~09로 0이 채워져 있고(프로토타입은 1~12) 분 모드 표기도 다르다. 에러가 뜨면 입력창이 밑줄로 바뀐다. 여러 화면이 어긋나 2등급.</td></tr>
+<tr><td>3</td><td>정보 확인 화면 일치</td><td class="n">1.0</td><td class="n">3</td><td class="n">0.75</td><td>정보 박스, 성별 원, 문구는 일치한다. 시작하기 버튼이 프로토타입(y 0.77)보다 많이 아래(0.855)에 있어 구름과 겹친다.</td></tr>
+<tr><td>4</td><td>온보딩 애니메이션 완성도</td><td class="n">1.5</td><td class="n">2</td><td class="n">0.75</td><td>요소별 시차 페이드인만 있다(달 0ms, 구름 350~630ms, 로고·문구 980ms, 버튼 1400ms). 이동이나 스케일 같은 추가 효과가 없어 '적당한 수준'.</td></tr>
+<tr><td>5</td><td>화면전환 효과 완성도</td><td class="n">1.5</td><td class="n">2</td><td class="n">0.75</td><td>모든 단계에 같은 페이드+스케일(0.97→1.0, 350ms)을 쓴다. 이전으로 돌아갈 때도 같은 효과라 방향성이 없어 '적당한 수준'.</td></tr>
+<tr><td>6</td><td>오류·안내 메시지가 친절한가</td><td class="n">1.0</td><td class="n">3</td><td class="n">0.75</td><td>문장형 메시지다. 다만 이름 안내가 실제 규칙(2자)과 다르고, 나이는 '올바른 나이를'만 있어 이유를 알려주지 않는다. 한글·영문 외 입력은 안내 없이 차단된다. 4등급 기준에는 못 미친다.</td></tr>
+<tr><th colspan="4">주관 합계</th><th class="n">4.25</th><th>/ 7.0 (등급÷4 × 배점)</th></tr>
+</table>
+
+<h3 style="margin-top:26px">객관 항목 (28점) — 하위 항목별 전부/전무</h3>
+<div id="filter" class="filter"><span>보기</span><button class="on" data-f="all">전체</button><button data-f="bad">감점만</button><button data-f="ok">만점만</button><span class="hint">표의 행을 누르면 상세로 이동한다</span></div>
+<table id="objSummary">
+<tr><th>#</th><th>항목</th><th class="n">배점</th><th class="n">득점</th><th>득점률</th><th>감점 하위 항목</th></tr>
+<tr class="bad click" data-s="bad" data-d="7" title="클릭하면 하위 항목 상세로 이동한다"><td>7</td><td>앱 아이콘 / 앱 이름</td><td class="n">1.0</td><td class="n">0.0</td><td><div class="bar zero"><i style="--w:0%"></i></div><span class="pct">0%</span></td><td>app_icon.png가 앱 아이콘으로 적용; 앱 이름 "Daily Tarot"</td></tr>
+<tr class="part click" data-s="bad" data-d="8" title="클릭하면 하위 항목 상세로 이동한다"><td>8</td><td>제출 시 유의사항</td><td class="n">2.0</td><td class="n">1.0</td><td><div class="bar part"><i style="--w:50%"></i></div><span class="pct">50%</span></td><td>제출용 USB에 소스 디렉토리가 올바르게 제출; APK 파일명 규칙 (Module_A_XXX.apk)</td></tr>
+<tr class=" click" data-s="ok" data-d="9" title="클릭하면 하위 항목 상세로 이동한다"><td>9</td><td>[온보딩] UI 요소</td><td class="n">1.4</td><td class="n">1.4</td><td><div class="bar full"><i style="--w:100%"></i></div><span class="pct">100%</span></td><td>—</td></tr>
+<tr class=" click" data-s="ok" data-d="10" title="클릭하면 하위 항목 상세로 이동한다"><td>10</td><td>[온보딩] 요구사항</td><td class="n">2.4</td><td class="n">2.4</td><td><div class="bar full"><i style="--w:100%"></i></div><span class="pct">100%</span></td><td>—</td></tr>
+<tr class=" click" data-s="ok" data-d="11" title="클릭하면 하위 항목 상세로 이동한다"><td>11</td><td>[이름] UI 요소</td><td class="n">1.6</td><td class="n">1.6</td><td><div class="bar full"><i style="--w:100%"></i></div><span class="pct">100%</span></td><td>—</td></tr>
+<tr class="part click" data-s="bad" data-d="12" title="클릭하면 하위 항목 상세로 이동한다"><td>12</td><td>[이름] 요구사항</td><td class="n">2.4</td><td class="n">1.6</td><td><div class="bar part"><i style="--w:67%"></i></div><span class="pct">67%</span></td><td>최소 2자, 최대 20자까지 가능; 조건을 만족하면 나이 화면으로 이동</td></tr>
+<tr class=" click" data-s="ok" data-d="13" title="클릭하면 하위 항목 상세로 이동한다"><td>13</td><td>[나이] UI 요소</td><td class="n">1.6</td><td class="n">1.6</td><td><div class="bar full"><i style="--w:100%"></i></div><span class="pct">100%</span></td><td>—</td></tr>
+<tr class=" click" data-s="ok" data-d="14" title="클릭하면 하위 항목 상세로 이동한다"><td>14</td><td>[나이] 요구사항</td><td class="n">2.4</td><td class="n">2.4</td><td><div class="bar full"><i style="--w:100%"></i></div><span class="pct">100%</span></td><td>—</td></tr>
+<tr class=" click" data-s="ok" data-d="15" title="클릭하면 하위 항목 상세로 이동한다"><td>15</td><td>[성별] UI 요소</td><td class="n">1.6</td><td class="n">1.6</td><td><div class="bar full"><i style="--w:100%"></i></div><span class="pct">100%</span></td><td>—</td></tr>
+<tr class=" click" data-s="ok" data-d="16" title="클릭하면 하위 항목 상세로 이동한다"><td>16</td><td>[성별] 요구사항</td><td class="n">1.2</td><td class="n">1.2</td><td><div class="bar full"><i style="--w:100%"></i></div><span class="pct">100%</span></td><td>—</td></tr>
+<tr class="part click" data-s="bad" data-d="17" title="클릭하면 하위 항목 상세로 이동한다"><td>17</td><td>[날짜] UI 요소</td><td class="n">1.6</td><td class="n">1.4</td><td><div class="bar part"><i style="--w:88%"></i></div><span class="pct">88%</span></td><td>"태어난 날짜를 입력해주세요." 텍스트</td></tr>
+<tr class=" click" data-s="ok" data-d="18" title="클릭하면 하위 항목 상세로 이동한다"><td>18</td><td>[날짜] 요구사항</td><td class="n">1.6</td><td class="n">1.6</td><td><div class="bar full"><i style="--w:100%"></i></div><span class="pct">100%</span></td><td>—</td></tr>
+<tr class=" click" data-s="ok" data-d="19" title="클릭하면 하위 항목 상세로 이동한다"><td>19</td><td>[시간] UI 요소</td><td class="n">2.0</td><td class="n">2.0</td><td><div class="bar full"><i style="--w:100%"></i></div><span class="pct">100%</span></td><td>—</td></tr>
+<tr class="part click" data-s="bad" data-d="20" title="클릭하면 하위 항목 상세로 이동한다"><td>20</td><td>[시간] 요구사항</td><td class="n">2.0</td><td class="n">1.6</td><td><div class="bar part"><i style="--w:80%"></i></div><span class="pct">80%</span></td><td>이전 클릭 시 성별 화면 이동</td></tr>
+<tr class=" click" data-s="ok" data-d="21" title="클릭하면 하위 항목 상세로 이동한다"><td>21</td><td>[정보 확인] UI 요소</td><td class="n">2.0</td><td class="n">2.0</td><td><div class="bar full"><i style="--w:100%"></i></div><span class="pct">100%</span></td><td>—</td></tr>
+<tr class="part click" data-s="bad" data-d="22" title="클릭하면 하위 항목 상세로 이동한다"><td>22</td><td>[정보 확인] 요구사항</td><td class="n">1.2</td><td class="n">0.3</td><td><div class="bar part"><i style="--w:25%"></i></div><span class="pct">25%</span></td><td>각 영역 클릭 시 해당 입력 화면으로 이동; 시작하기 클릭 시 홈 화면으로 이동; 홈 화면은 빈 화면 표시</td></tr>
+<tr><th colspan="3">객관 합계</th><th class="n">23.7</th><th colspan="2">/ 28.0</th></tr>
+</table>
+
+<h3 style="margin-top:22px">하위 항목 상세 (감점이 있는 항목은 펼쳐져 있다)</h3>
+<details id="d7" data-s="bad" open><summary><b>7. 앱 아이콘 / 앱 이름</b> — 0.0 / 1.0</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class="bad"><td>app_icon.png가 앱 아이콘으로 적용</td><td class="n">0.5</td><td class="n">0.0</td><td><span class="tag bad">미충족</span></td><td>앱 서랍에서 Flutter 기본 아이콘이 보인다 (캡처 01)</td></tr>
+<tr class="bad"><td>앱 이름 "Daily Tarot"</td><td class="n">0.5</td><td class="n">0.0</td><td><span class="tag bad">미충족</span></td><td>앱 이름이 <code>module_abc</code>이다 (AndroidManifest.xml의 label)</td></tr>
+</table></details>
+<details id="d8" data-s="bad" open><summary><b>8. 제출 시 유의사항</b> — 1.0 / 2.0</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class="bad"><td>제출용 USB에 소스 디렉토리가 올바르게 제출</td><td class="n">0.5</td><td class="n">0.0</td><td><span class="tag bad">미충족</span></td><td>APK가 소스 루트가 아니라 <code>apk/</code> 폴더 안에 있다</td></tr>
+<tr class="bad"><td>APK 파일명 규칙 (Module_A_XXX.apk)</td><td class="n">0.5</td><td class="n">0.0</td><td><span class="tag bad">미충족</span></td><td><code>daily_tarot.apk</code>이다</td></tr>
+<tr class=""><td>제공된 APK로 평가</td><td class="n">0.5</td><td class="n">0.5</td><td><span class="tag ok">충족</span></td><td>APK를 설치해 정상 실행되었다</td></tr>
+<tr class=""><td>시간 내 제출</td><td class="n">0.5</td><td class="n">0.5</td><td><span class="tag ok">충족</span></td><td>확인할 수 없어 정상으로 가정했다</td></tr>
+</table></details>
+<details id="d9" data-s="ok"><summary><b>9. [온보딩] UI 요소</b> — 1.4 / 1.4</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class=""><td>그라디언트 배경</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 03</td></tr>
+<tr class=""><td>달 그래픽</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 03</td></tr>
+<tr class=""><td>Daily Tarot 로고</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 03</td></tr>
+<tr class=""><td>작은 로고 그래픽 이미지</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 03</td></tr>
+<tr class=""><td>"운명을 엿볼 시간이에요." 중앙 정렬</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 03</td></tr>
+<tr class=""><td>시작하기 버튼 (">" 포함, 중앙 정렬)</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 03 (위치는 프로토타입보다 위, 주관에서 반영)</td></tr>
+<tr class=""><td>구름 그래픽 (아래 배경)</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 03</td></tr>
+</table></details>
+<details id="d10" data-s="ok"><summary><b>10. [온보딩] 요구사항</b> — 2.4 / 2.4</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class=""><td>앱 시작 시 그라디언트 배경 표시</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 02, 03</td></tr>
+<tr class=""><td>달·구름이 2초 이내 애니메이션</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>코드: 달 0+350ms, 구름 최대 350+280+350=980ms</td></tr>
+<tr class=""><td>로고·문구가 2초 이내 애니메이션</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>코드: 980+350=1330ms</td></tr>
+<tr class=""><td>시작하기 버튼이 2초 이내 애니메이션</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>코드: 1400+350=1750ms (2초 이내지만 여유 0.25초)</td></tr>
+<tr class=""><td>요소별로 다른 시간에 애니메이션</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>달 / 구름(70ms 간격) / 로고·문구 / 버튼이 서로 다른 지연</td></tr>
+<tr class=""><td>시작하기 클릭 시 정보 입력(이름) 화면 이동</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 04, 05</td></tr>
+</table></details>
+<details id="d11" data-s="ok"><summary><b>11. [이름] UI 요소</b> — 1.6 / 1.6</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class=""><td>달 그래픽</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 05</td></tr>
+<tr class=""><td>로고 (작은 로고 포함)</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 05</td></tr>
+<tr class=""><td>"이름을 입력해주세요." 텍스트</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 05</td></tr>
+<tr class=""><td>이름 입력 텍스트 필드</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 05</td></tr>
+<tr class=""><td>Place holder "이름을 입력해주세요."</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 05</td></tr>
+<tr class=""><td>구름 그래픽</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 05</td></tr>
+<tr class=""><td>이전 버튼 ("<" 포함)</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 05</td></tr>
+<tr class=""><td>1/5 진행 표시줄</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 05 (첫 칸만 채워짐)</td></tr>
+</table></details>
+<details id="d12" data-s="bad" open><summary><b>12. [이름] 요구사항</b> — 1.6 / 2.4</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class=""><td>텍스트 입력이 가능</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 07, 08</td></tr>
+<tr class="bad"><td>최소 2자, 최대 20자까지 가능</td><td class="n">0.4</td><td class="n">0.0</td><td><span class="tag bad">미충족</span></td><td>2자("ab")를 입력하면 오류가 난다. 3자 이상으로 구현되어 있다 (캡처 08). 21자는 오류, 20자는 통과한다 (41, 42)</td></tr>
+<tr class=""><td>Enter 시 유효성 검사 진행</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 06, 07</td></tr>
+<tr class=""><td>미입력/조건 불만족 시 오류 메시지 표시</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 06, 07, 41</td></tr>
+<tr class="bad"><td>조건을 만족하면 나이 화면으로 이동</td><td class="n">0.4</td><td class="n">0.0</td><td><span class="tag bad">미충족</span></td><td>정상 이름인 2자는 이동하지 못한다 (3자 이상만 이동)</td></tr>
+<tr class=""><td>이전 클릭 시 온보딩 화면 이동</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 33</td></tr>
+</table></details>
+<details id="d13" data-s="ok"><summary><b>13. [나이] UI 요소</b> — 1.6 / 1.6</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class=""><td>달 그래픽</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 10</td></tr>
+<tr class=""><td>로고 (작은 로고 포함)</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 10</td></tr>
+<tr class=""><td>"나이를 입력해주세요." 텍스트</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 10</td></tr>
+<tr class=""><td>나이 입력 텍스트 필드</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 10</td></tr>
+<tr class=""><td>Place holder "나이를 입력해주세요."</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 10</td></tr>
+<tr class=""><td>구름 그래픽</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 10</td></tr>
+<tr class=""><td>이전 버튼</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 10</td></tr>
+<tr class=""><td>2/5 진행 표시줄</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 10</td></tr>
+</table></details>
+<details id="d14" data-s="ok"><summary><b>14. [나이] 요구사항</b> — 2.4 / 2.4</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class=""><td>텍스트 입력이 가능</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 13</td></tr>
+<tr class=""><td>숫자만 입력 가능</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 43 (영문 입력이 차단됨)</td></tr>
+<tr class=""><td>Enter 시 유효성 검사 진행</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 11, 12</td></tr>
+<tr class=""><td>미입력/비정상 입력 시 오류 메시지</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 11 (빈값), 12 (0)</td></tr>
+<tr class=""><td>조건 만족 시 성별 화면 이동</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 14</td></tr>
+<tr class=""><td>이전 클릭 시 이름 화면 이동</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>코드: currentStep-- (이름 화면). 입력값은 비워진다</td></tr>
+</table></details>
+<details id="d15" data-s="ok"><summary><b>15. [성별] UI 요소</b> — 1.6 / 1.6</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class=""><td>달 그래픽</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 14</td></tr>
+<tr class=""><td>로고 (작은 로고 포함)</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 14</td></tr>
+<tr class=""><td>"성별을 선택해주세요." 텍스트</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 14</td></tr>
+<tr class=""><td>남성 기호 아이콘 선택 버튼</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 14</td></tr>
+<tr class=""><td>여성 기호 아이콘 선택 버튼</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 14</td></tr>
+<tr class=""><td>구름 그래픽</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 14</td></tr>
+<tr class=""><td>이전 버튼</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 14</td></tr>
+<tr class=""><td>3/5 진행 표시줄</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 14</td></tr>
+</table></details>
+<details id="d16" data-s="ok"><summary><b>16. [성별] 요구사항</b> — 1.2 / 1.2</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class=""><td>성별 선택이 가능</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 14, 44 (선택 시 강조 표시)</td></tr>
+<tr class=""><td>선택하면 태어난 날짜 화면 이동</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 17, 44</td></tr>
+<tr class=""><td>이전 클릭 시 나이 화면 이동</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 15</td></tr>
+</table></details>
+<details id="d17" data-s="bad" open><summary><b>17. [날짜] UI 요소</b> — 1.4 / 1.6</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class=""><td>달 그래픽</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 18</td></tr>
+<tr class=""><td>로고 (작은 로고 포함)</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 18</td></tr>
+<tr class="bad"><td>"태어난 날짜를 입력해주세요." 텍스트</td><td class="n">0.2</td><td class="n">0.0</td><td><span class="tag bad">미충족</span></td><td>텍스트가 없다 — <code>messages[4]</code>가 빈 문자열이다 (캡처 18)</td></tr>
+<tr class=""><td>{년}.{월} 텍스트</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 18 (2026.11)</td></tr>
+<tr class=""><td>날짜 달력</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 18</td></tr>
+<tr class=""><td>구름 그래픽</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 18</td></tr>
+<tr class=""><td>이전 버튼</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 18</td></tr>
+<tr class=""><td>4/5 진행 표시줄</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 18</td></tr>
+</table></details>
+<details id="d18" data-s="ok"><summary><b>18. [날짜] 요구사항</b> — 1.6 / 1.6</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class=""><td>{년}.{월} 클릭 시 연도·월 선택</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 19, 20, 21</td></tr>
+<tr class=""><td>선택하면 맞는 달력 표시</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 22 (2023.11 → 1일이 수요일, 정확)</td></tr>
+<tr class=""><td>날짜 선택 시 시간 화면 이동</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 23, 24</td></tr>
+<tr class=""><td>이전 클릭 시 성별 화면 이동</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 45 (성별 화면, 선택 강조 유지)</td></tr>
+</table></details>
+<details id="d19" data-s="ok"><summary><b>19. [시간] UI 요소</b> — 2.0 / 2.0</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class=""><td>달 그래픽</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 24</td></tr>
+<tr class=""><td>로고 (작은 로고 포함)</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 24</td></tr>
+<tr class=""><td>"태어난 시간을 입력해주세요." 텍스트</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 24</td></tr>
+<tr class=""><td>{시간} : {분} 텍스트</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 24</td></tr>
+<tr class=""><td>AM, PM 선택 토글</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 24, 25</td></tr>
+<tr class=""><td>시계 그래픽</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 24 (숫자 표기는 프로토타입과 다름)</td></tr>
+<tr class=""><td>구름 그래픽</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 24</td></tr>
+<tr class=""><td>이전 버튼</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 24</td></tr>
+<tr class=""><td>잘 모르겠어요 버튼</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 24</td></tr>
+<tr class=""><td>5/5 진행 표시줄</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 24</td></tr>
+</table></details>
+<details id="d20" data-s="bad" open><summary><b>20. [시간] 요구사항</b> — 1.6 / 2.0</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class=""><td>AM, PM 토글 변경 가능</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 25 (PM 선택 → 15:30), 47 (AM 12시 → 00:00)</td></tr>
+<tr class=""><td>시 선택 시 {시간}에 입력되고 분 선택 활성화</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 26</td></tr>
+<tr class=""><td>분 선택 시 정보 확인 화면 이동</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 27, 28</td></tr>
+<tr class=""><td>잘 모르겠어요 클릭 시 정보 확인 화면 이동</td><td class="n">0.4</td><td class="n">0.4</td><td><span class="tag ok">충족</span></td><td>캡처 34 (시간: 모름)</td></tr>
+<tr class="bad"><td>이전 클릭 시 성별 화면 이동</td><td class="n">0.4</td><td class="n">0.0</td><td><span class="tag bad">미충족</span></td><td>날짜 화면으로 이동한다 (캡처 46). 채점표는 성별 화면</td></tr>
+</table></details>
+<details id="d21" data-s="ok"><summary><b>21. [정보 확인] UI 요소</b> — 2.0 / 2.0</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class=""><td>달 그래픽</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 28</td></tr>
+<tr class=""><td>로고 (작은 로고 포함)</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 28</td></tr>
+<tr class=""><td>"입력한 정보가 맞는지 확인해주세요." 텍스트</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 28</td></tr>
+<tr class=""><td>이름 확인 영역</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 28</td></tr>
+<tr class=""><td>나이 확인 영역</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 28</td></tr>
+<tr class=""><td>성별 확인 영역</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 28</td></tr>
+<tr class=""><td>생일 확인 영역</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 28</td></tr>
+<tr class=""><td>태어난 시간 확인 영역</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 28</td></tr>
+<tr class=""><td>시작하기 버튼</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 28 (위치는 프로토타입보다 아래)</td></tr>
+<tr class=""><td>구름 그래픽</td><td class="n">0.2</td><td class="n">0.2</td><td><span class="tag ok">충족</span></td><td>캡처 28</td></tr>
+</table></details>
+<details id="d22" data-s="bad" open><summary><b>22. [정보 확인] 요구사항</b> — 0.3 / 1.2</summary>
+<table><tr><th>하위 항목</th><th class="n">배점</th><th class="n">득점</th><th>판정</th><th>근거</th></tr>
+<tr class=""><td>각 영역에 입력한 값이 올바르게 표시</td><td class="n">0.3</td><td class="n">0.3</td><td><span class="tag ok">충족</span></td><td>캡처 28 (abc/25세/남성/2023.11.15/15:30), 47 (00:00), 34 (모름)</td></tr>
+<tr class="bad"><td>각 영역 클릭 시 해당 입력 화면으로 이동</td><td class="n">0.3</td><td class="n">0.0</td><td><span class="tag bad">미충족</span></td><td>이름·나이·생일·시간 영역을 눌러도 반응이 없다 (29, 30, 31)</td></tr>
+<tr class="bad"><td>시작하기 클릭 시 홈 화면으로 이동</td><td class="n">0.3</td><td class="n">0.0</td><td><span class="tag bad">미충족</span></td><td>반응이 없고 <code>debugPrint</code>만 실행된다 (32)</td></tr>
+<tr class="bad"><td>홈 화면은 빈 화면 표시</td><td class="n">0.3</td><td class="n">0.0</td><td><span class="tag bad">미충족</span></td><td>홈 화면이 존재하지 않는다</td></tr>
+</table></details>
+
+<h2 id="defect">2. 감점 요소 (사진 포함)</h2>
+<div class="defect"><div><h3>① 앱 아이콘·앱 이름 미적용 <span class="pts">−1.0 (7번)</span></h3><p>앱 서랍에서 아이콘이 Flutter 기본 로고이고, 이름이 <code>module_abc</code>이다. 요구사항은 <code>app_icon.png</code> 아이콘과 "Daily Tarot" 이름이다.</p><p><b>원인</b>: <code>AndroidManifest.xml</code>의 <code>android:label="module_abc"</code>, <code>mipmap</code> 아이콘이 기본값이다.</p></div><div class="shots"><figure><img src="screenshot/01_launcher_appdrawer.png" alt="01 앱 서랍"><figcaption>01 앱 서랍</figcaption></figure></div></div>
+<div class="defect"><div><h3>② 이름 최소 글자 수 오류 <span class="pts">−0.8 (12번)</span></h3><p>과제는 "최소 2자, 최대 20자"인데 2자(<code>ab</code>)를 입력하고 Enter를 눌러도 "3자 이상" 오류가 나온다. 안내 문구까지 3자로 적혀 있다.</p><p>정상 이름인 2자가 다음 화면으로 이동하지 못하는 것도 별도로 감점했다(하위 항목 2번, 5번 각 −0.4). 21자는 오류, 20자는 통과하는 것은 확인했다(캡처 41, 42).</p><p><b>위치</b>: <code>lib/main.dart:341-342</code></p></div><div class="shots"><figure><img src="screenshot/08_name_2chars_result.png" alt="08 2자 입력 후 Enter"><figcaption>08 2자 입력 후 Enter</figcaption></figure></div></div>
+<div class="defect"><div><h3>③ 정보 확인 화면 동작 없음 <span class="pts">−0.9 (22번)</span></h3><p>이름·나이·생일·시간 영역을 눌러도 아무 일도 일어나지 않는다. "시작하기"도 <code>debugPrint</code>만 찍고 끝나서 홈(빈 화면)으로 이동하지 않는다. 요구사항 4개 중 값 표시 1개만 충족했다.</p><p><b>위치</b>: <code>infoBox</code>(<code>main.dart:749</code>)에 탭 처리가 없고, <code>main.dart:820-823</code>에 <code>TODO</code>가 남아 있다.</p></div><div class="shots"><figure><img src="screenshot/29_confirm_tap_name_box.png" alt="29 이름 영역 탭 → 변화 없음"><figcaption>29 이름 영역 탭 → 변화 없음</figcaption></figure><figure><img src="screenshot/32_confirm_tap_start_button.png" alt="32 시작하기 탭 → 변화 없음"><figcaption>32 시작하기 탭 → 변화 없음</figcaption></figure></div></div>
+<div class="defect"><div><h3>④ 날짜 화면 안내 문구 누락 <span class="pts">−0.2 (17번)</span></h3><p>"태어난 날짜를 입력해주세요." 텍스트가 없어 로고 아래가 비어 있다.</p><p><b>원인</b>: <code>messages[4]</code>가 빈 문자열이다 (<code>main.dart:36</code>, 주석 "문구 없음").</p></div><div class="shots"><figure><img src="screenshot/18_birthdate_calendar.png" alt="18 날짜 달력"><figcaption>18 날짜 달력</figcaption></figure></div></div>
+<div class="defect warn"><div><h3>⑤ APK 파일명·위치 <span class="pts">−1.0 (8번)</span></h3><p>규칙은 소스 루트에 <code>Module_A_XXX.apk</code>(XXX = 선수 번호)이다. 현재는 <code>apk/daily_tarot.apk</code>이다. 파일명 규칙과 위치, 두 하위 항목(각 0.5)이 모두 어긋난다.</p><p>※ 정확한 감점 단위는 심사위원 판단에 따라 달라질 수 있다.</p></div><div class="shots"><p style="color:var(--sub);font-size:14px">파일 위치<br><code>026-reg-hsu/apk/daily_tarot.apk</code> (82.7MB)</p></div></div>
+<div class="defect warn"><div><h3>⑥ 시간 화면의 이전 버튼 목적지 <span class="pts">−0.4 (20번)</span></h3><p>채점표 20-5는 "이전 버튼 클릭 시 <b>성별 선택 화면</b>으로 이동"이다. 코드는 모든 단계에서 <code>currentStep--</code>라서 날짜 화면으로 간다. 에뮬레이터에서 직접 확인했다(캡처 46).</p><p>과제 문서의 오타일 수 있으니 대회 때는 출제 위원에게 확인하거나 문서대로 구현하는 쪽이 안전하다.</p><p><b>위치</b>: <code>main.dart:257-263</code></p></div><div class="shots"><figure><img src="screenshot/46_prev_from_time.png" alt="46 시간 화면에서 이전 → 날짜 화면"><figcaption>46 시간 화면에서 이전 → 날짜 화면</figcaption></figure></div></div>
+<div class="defect warn"><div><h3>⑦ 주관 항목에서 점수가 깎일 만한 곳 <span class="pts">(주관)</span></h3><ul><li><b>에러 시 입력창 모양이 바뀐다.</b> 평소엔 둥근 테두리인데 에러가 뜨면 밑줄로 바뀐다. <code>errorBorder</code>를 지정하지 않았기 때문이다. (정보 입력 일치도, 2번)</li><li><b>이전으로 돌아오면 입력값이 사라진다.</b> 나이 화면으로 돌아가면 빈칸이다. <code>name</code>, <code>age</code> 변수가 있는데 <code>TextField</code>에 연결하지 않았다.</li><li><b>이름에 한글·영문 외 문자를 조용히 막는다.</b> 이유를 알려주지 않아서 "친절한 메시지"(6번) 4등급을 받기 어렵다. 예: "이름 항목에는 한글과 영문만 입력할 수 있어요."</li></ul></div><div class="shots"><figure><img src="screenshot/06_name_error_empty.png" alt="06 에러 시 밑줄로 바뀜"><figcaption>06 에러 시 밑줄로 바뀜</figcaption></figure><figure><img src="screenshot/15_prev_from_gender_to_age.png" alt="15 이전 후 값이 사라짐"><figcaption>15 이전 후 값이 사라짐</figcaption></figure></div></div>
+
+<div class="rv">
+<h3>고칠 순서</h3>
+<ol class="order">
+<li><b>앱 이름·아이콘</b> 교체 (7번) · 5분 · +1.0</li>
+<li><b>확인 화면 이동 + 빈 홈 화면</b> (22번) · 15분 · +0.9</li>
+<li><b>APK 이름·위치</b> 정리 (8번) · 3분 · +1.0</li>
+<li><b>이름 최소 2자</b> (12번) · 1분 · +0.8</li>
+<li><b>날짜 안내 문구</b> (17번) · 1분 · +0.2</li>
+<li><b>시간 화면 이전 버튼</b> 목적지 (20번) · 5분 · +0.4</li>
+</ol>
+<p class="sub" style="margin:8px 0 0">합계 약 +4.3점이다. 주관 항목(날짜·시간 화면 디자인, 버튼 위치)은 별도로 개선할 수 있다.</p>
+</div>
+
+<h2 id="proto">2-1. 프로토타입 대조 (주관 감점 근거)</h2>
+<p class="sub">왼쪽이 과제 PDF 원본 프로토타입, 오른쪽이 에뮬레이터에서 찍은 앱 화면이다.</p>
+<table>
+<tr><th>화면</th><th>프로토타입</th><th>앱</th><th>반영</th></tr>
+<tr><td>온보딩</td><td>문구 y≈0.42, 버튼 y≈0.64, 진행 막대 없음</td><td>문구 0.37, 버튼 0.56, 흐린 진행 막대 표시</td><td>주관 1</td></tr>
+<tr><td>날짜</td><td>안내 문구 있음, 요일 줄 없음, 이전·다음 달 흐린 날짜 표시</td><td>안내 문구 없음, 요일 줄 있음, 빈칸</td><td>17번 −0.2, 주관 2</td></tr>
+<tr><td>시간(시)</td><td>숫자 1~12</td><td>01~12 (0 채움)</td><td>주관 2</td></tr>
+<tr><td>시간(분)</td><td>같은 1~12 숫자 위에서 선택 (12 = 00분)</td><td>00~55 표기</td><td>주관 2 (기능상 문제는 없음)</td></tr>
+<tr><td>확인</td><td>시작하기 버튼 y≈0.77</td><td>0.855, 구름과 겹침</td><td>주관 3</td></tr>
+<tr><td>공통</td><td>에러가 떠도 둥근 입력창 유지(추정)</td><td>에러 시 밑줄로 바뀜</td><td>주관 2</td></tr>
+<tr><td>공통</td><td>—</td><td>상태바 글자(시계)가 어두운 색이라 짙은 보라 배경에서 거의 안 보임</td><td>참고 (<code>SystemUiOverlayStyle</code> 권장)</td></tr>
+</table>
+<div class="gal" style="margin-top:14px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr))">
+<figure><img src="prototype/onboarding.png"><figcaption>프로토타입 · 온보딩</figcaption></figure>
+<figure><img src="screenshot/03_onboarding_final.png"><figcaption>앱 · 온보딩 (03)</figcaption></figure>
+<figure><img src="prototype/date.png"><figcaption>프로토타입 · 날짜</figcaption></figure>
+<figure><img src="screenshot/22_calendar_after_dialog.png"><figcaption>앱 · 날짜 (22)</figcaption></figure>
+<figure><img src="prototype/time_hour.png"><figcaption>프로토타입 · 시간(시)</figcaption></figure>
+<figure><img src="screenshot/24_time_screen_hour.png"><figcaption>앱 · 시간(시) (24)</figcaption></figure>
+<figure><img src="prototype/time_minute.png"><figcaption>프로토타입 · 시간(분)</figcaption></figure>
+<figure><img src="screenshot/26_time_hour_selected_minute_mode.png"><figcaption>앱 · 시간(분) (26)</figcaption></figure>
+<figure><img src="prototype/confirm.png"><figcaption>프로토타입 · 확인</figcaption></figure>
+<figure><img src="screenshot/28_confirm_screen.png"><figcaption>앱 · 확인 (28)</figcaption></figure>
+</div>
+
+<h2 id="code">3. 코드 리뷰</h2>
+<div class="rv">
+<h3>코드의 분류 없음</h3>
+<ul>
+<li>한 파일안에 코드를 넣으면 어느 부분이 어떤 역할을 하는지 찾기 어렵고 일일이 내려가며 읽기 어렵다.</li>
+<li>코드 분류 및 가독성을 위해 폴더를 나누어 그 안에 파일을 만들어 작업하자 현서야.</li>
+</ul>
+
+<h3>특정부분에 몰려있는 과도한 함수화</h3>
+<ul>
+<li>적절한 함수화는 반복되는 코드를 줄이고 코드를 재사용할 수 있지만, 과도한 함수화는 오히려 전체 구조를 얽히게 하고 이를 읽는 사람으로 하여금 실행 흐름 파악에 대한 어려움과 불필요한 간섭을 만들어 낼 수 있다.</li>
+<li>너무 작게 쪼개서 함수를 만드는 것은 읽는 사람이 함수를 계속해서 건너뛰어 보게되고 함수 하나를 수정하면 다른 함수들도 수정되기에 조심해야한다.</li>
+<li>함수화는 좋지만 "과유불급"이란 말이 있듯이 적당히 하는 것이 좋지만 소스 코드가 지금 얽혀서 스파게티 코드처럼 될 수 있는 위험성이 크니 조심하자.</li>
+</ul>
+</div>
+
+<h2 id="shots">4. 전체 캡처 (화면 순서)</h2>
+<p class="sub">에뮬레이터에서 앱을 실행하며 찍은 화면이다. 파일은 <code>review/screenshot/</code>에 있다.</p>
+<div class="gal">
+<figure><img src="screenshot/00_launcher_home.png" alt="00 런처 홈"><figcaption>00 런처 홈</figcaption></figure>
+<figure><img src="screenshot/01_launcher_appdrawer.png" alt="01 앱 서랍(아이콘·이름)"><figcaption>01 앱 서랍(아이콘·이름)</figcaption></figure>
+<figure><img src="screenshot/02_onboarding_anim_3.png" alt="02 온보딩 등장 중"><figcaption>02 온보딩 등장 중</figcaption></figure>
+<figure><img src="screenshot/03_onboarding_final.png" alt="03 온보딩 완료"><figcaption>03 온보딩 완료</figcaption></figure>
+<figure><img src="screenshot/04_transition_onboarding_to_name.png" alt="04 전환 중 (온보딩 → 이름)"><figcaption>04 전환 중 (온보딩 → 이름)</figcaption></figure>
+<figure><img src="screenshot/05_name_screen.png" alt="05 이름 입력"><figcaption>05 이름 입력</figcaption></figure>
+<figure><img src="screenshot/06_name_error_empty.png" alt="06 이름 비움 → 오류"><figcaption>06 이름 비움 → 오류</figcaption></figure>
+<figure><img src="screenshot/07_name_error_1char.png" alt="07 1자 → 오류"><figcaption>07 1자 → 오류</figcaption></figure>
+<figure><img src="screenshot/08_name_typed_2chars.png" alt="08 "ab" 입력"><figcaption>08 "ab" 입력</figcaption></figure>
+<figure><img src="screenshot/08_name_2chars_result.png" alt="08 "ab" Enter → 거부"><figcaption>08 "ab" Enter → 거부</figcaption></figure>
+<figure><img src="screenshot/09_transition_name_to_age.png" alt="09 전환 중 (이름 → 나이)"><figcaption>09 전환 중 (이름 → 나이)</figcaption></figure>
+<figure><img src="screenshot/10_age_screen.png" alt="10 나이 입력"><figcaption>10 나이 입력</figcaption></figure>
+<figure><img src="screenshot/11_age_error_empty.png" alt="11 나이 비움 → 오류"><figcaption>11 나이 비움 → 오류</figcaption></figure>
+<figure><img src="screenshot/12_age_error_zero.png" alt="12 "0" → 오류"><figcaption>12 "0" → 오류</figcaption></figure>
+<figure><img src="screenshot/13_age_typed_25.png" alt="13 "25" 입력"><figcaption>13 "25" 입력</figcaption></figure>
+<figure><img src="screenshot/14_gender_screen.png" alt="14 성별 선택"><figcaption>14 성별 선택</figcaption></figure>
+<figure><img src="screenshot/15_prev_from_gender_to_age.png" alt="15 이전 → 나이(값 사라짐)"><figcaption>15 이전 → 나이(값 사라짐)</figcaption></figure>
+<figure><img src="screenshot/16_gender_again.png" alt="16 성별 다시"><figcaption>16 성별 다시</figcaption></figure>
+<figure><img src="screenshot/17_transition_gender_to_date.png" alt="17 전환 중 (성별 → 날짜)"><figcaption>17 전환 중 (성별 → 날짜)</figcaption></figure>
+<figure><img src="screenshot/18_birthdate_calendar.png" alt="18 날짜 달력(안내 문구 없음)"><figcaption>18 날짜 달력(안내 문구 없음)</figcaption></figure>
+<figure><img src="screenshot/19_year_month_dialog.png" alt="19 연·월 선택 다이얼로그"><figcaption>19 연·월 선택 다이얼로그</figcaption></figure>
+<figure><img src="screenshot/20_year_month_dialog_scrolled.png" alt="20 다이얼로그 스크롤"><figcaption>20 다이얼로그 스크롤</figcaption></figure>
+<figure><img src="screenshot/21_year_month_dialog_changed.png" alt="21 연도 변경"><figcaption>21 연도 변경</figcaption></figure>
+<figure><img src="screenshot/22_calendar_after_dialog.png" alt="22 완료 후 2023.11 달력"><figcaption>22 완료 후 2023.11 달력</figcaption></figure>
+<figure><img src="screenshot/23_transition_date_to_time.png" alt="23 전환 중 (날짜 → 시간)"><figcaption>23 전환 중 (날짜 → 시간)</figcaption></figure>
+<figure><img src="screenshot/24_time_screen_hour.png" alt="24 시간 입력(시)"><figcaption>24 시간 입력(시)</figcaption></figure>
+<figure><img src="screenshot/25_time_pm_toggled.png" alt="25 PM 토글"><figcaption>25 PM 토글</figcaption></figure>
+<figure><img src="screenshot/26_time_hour_selected_minute_mode.png" alt="26 시 선택 → 분 모드"><figcaption>26 시 선택 → 분 모드</figcaption></figure>
+<figure><img src="screenshot/27_transition_time_to_confirm.png" alt="27 전환 중 (시간 → 확인)"><figcaption>27 전환 중 (시간 → 확인)</figcaption></figure>
+<figure><img src="screenshot/28_confirm_screen.png" alt="28 정보 확인"><figcaption>28 정보 확인</figcaption></figure>
+<figure><img src="screenshot/29_confirm_tap_name_box.png" alt="29 이름 영역 탭 (무반응)"><figcaption>29 이름 영역 탭 (무반응)</figcaption></figure>
+<figure><img src="screenshot/30_confirm_tap_age_box.png" alt="30 나이 영역 탭 (무반응)"><figcaption>30 나이 영역 탭 (무반응)</figcaption></figure>
+<figure><img src="screenshot/31_confirm_tap_time_box.png" alt="31 시간 영역 탭 (무반응)"><figcaption>31 시간 영역 탭 (무반응)</figcaption></figure>
+<figure><img src="screenshot/32_confirm_tap_start_button.png" alt="32 시작하기 탭 (무반응)"><figcaption>32 시작하기 탭 (무반응)</figcaption></figure>
+<figure><img src="screenshot/33_prev_from_name_to_onboarding.png" alt="33 이름 → 이전 → 온보딩"><figcaption>33 이름 → 이전 → 온보딩</figcaption></figure>
+<figure><img src="screenshot/34_unknown_time_confirm.png" alt="34 "잘 모르겠어요" → 시간 "모름""><figcaption>34 "잘 모르겠어요" → 시간 "모름"</figcaption></figure>
+<figure><img src="screenshot/40_name_filter_space_digit.png" alt="40 이름: 공백·숫자·특수문자 차단(안내 없음)"><figcaption>40 이름: 공백·숫자·특수문자 차단(안내 없음)</figcaption></figure>
+<figure><img src="screenshot/41_name_21chars_error.png" alt="41 이름 21자 → 오류"><figcaption>41 이름 21자 → 오류</figcaption></figure>
+<figure><img src="screenshot/42_name_20chars_pass.png" alt="42 이름 20자 → 통과"><figcaption>42 이름 20자 → 통과</figcaption></figure>
+<figure><img src="screenshot/43_age_letters_blocked.png" alt="43 나이: 영문 입력 차단"><figcaption>43 나이: 영문 입력 차단</figcaption></figure>
+<figure><img src="screenshot/44_date_after_female.png" alt="44 성별(여) 선택 후 날짜"><figcaption>44 성별(여) 선택 후 날짜</figcaption></figure>
+<figure><img src="screenshot/45_prev_from_date.png" alt="45 날짜 화면 이전 → 성별"><figcaption>45 날짜 화면 이전 → 성별</figcaption></figure>
+<figure><img src="screenshot/46_prev_from_time.png" alt="46 시간 화면 이전 → 날짜"><figcaption>46 시간 화면 이전 → 날짜</figcaption></figure>
+<figure><img src="screenshot/47_confirm_12am_00.png" alt="47 12시 AM → 00:00 표시"><figcaption>47 12시 AM → 00:00 표시</figcaption></figure>
+</div>
+
+</div>
+<div id="lb"><img alt=""><p></p></div>
+<script>
+(function(){
+ var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+ // 상단 읽기 진행 막대
+ var bar = document.getElementById('bar');
+ function prog(){var h=document.documentElement;var m=h.scrollHeight-h.clientHeight;bar.style.width=(m>0?h.scrollTop/m*100:0)+'%';}
+ addEventListener('scroll',prog,{passive:true});prog();
+ // 스크롤하면 요소가 아래에서 올라오며 나타남
+ document.querySelectorAll('.gal figure').forEach(function(f,i){f.style.transitionDelay=((i%6)*70)+'ms';});
+ var targets=document.querySelectorAll('h2,.score .box,.wrap>table,.wrap>.sub,.filter,#objSummary,.defect,.rv,details,.gal figure,.wrap>h3');
+ targets.forEach(function(e,i){e.classList.add('reveal');if(e.matches('.score .box'))e.style.transitionDelay=(i%4)*90+'ms';});
+ if(reduce||!('IntersectionObserver' in window)){targets.forEach(function(e){e.classList.add('in');});}
+ else{var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.06});targets.forEach(function(e){io.observe(e);});}
+ // 점수 카운트업
+ document.querySelectorAll('[data-count]').forEach(function(el){
+  var to=parseFloat(el.dataset.count),dec=parseInt(el.dataset.dec||'0',10);
+  if(reduce){el.textContent=to.toFixed(dec);return;}
+  var t0=performance.now(),d=1300;
+  (function f(t){var p=Math.min((t-t0)/d,1),e=1-Math.pow(1-p,3);el.textContent=(to*e).toFixed(dec);if(p<1)requestAnimationFrame(f);})(t0);
+ });
+ // 상단 메뉴: 현재 보고 있는 섹션 강조
+ var links=[].slice.call(document.querySelectorAll('nav a'));
+ if('IntersectionObserver' in window){
+  var so=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){links.forEach(function(l){l.classList.toggle('active',l.getAttribute('href')==='#'+e.target.id);});}});},{rootMargin:'-35% 0px -60% 0px'});
+  links.forEach(function(a){var s=document.querySelector(a.getAttribute('href'));if(s)so.observe(s);});
+ }
+ // 사진 클릭 → 크게 보기 (Esc 또는 클릭으로 닫기)
+ var lb=document.getElementById('lb'),lbi=lb.querySelector('img'),lbp=lb.querySelector('p');
+ document.querySelectorAll('figure img').forEach(function(img){img.addEventListener('click',function(){lbi.src=img.src;lbp.textContent=img.alt||'';lb.classList.add('on');});});
+ lb.addEventListener('click',function(){lb.classList.remove('on');});
+ addEventListener('keydown',function(e){if(e.key==='Escape')lb.classList.remove('on');});
+ // 객관 표: 행을 누르면 하위 항목 상세로 이동해서 펼치고 깜빡임
+ document.querySelectorAll('#objSummary tr.click').forEach(function(tr){
+  tr.addEventListener('click',function(){
+   var d=document.getElementById('d'+tr.dataset.d);if(!d)return;
+   d.classList.remove('hide');d.open=true;
+   d.scrollIntoView({behavior:reduce?'auto':'smooth',block:'center'});
+   d.classList.remove('flash');void d.offsetWidth;d.classList.add('flash');
+  });
+ });
+ // 객관 표 필터: 전체 / 감점만 / 만점만
+ var fb=document.querySelectorAll('#filter button');
+ fb.forEach(function(b){b.addEventListener('click',function(){
+  fb.forEach(function(x){x.classList.toggle('on',x===b);});
+  var f=b.dataset.f;
+  document.querySelectorAll('#objSummary tr[data-s],details[data-s]').forEach(function(el){
+   el.classList.toggle('hide',f!=='all'&&el.dataset.s!==f);
+  });
+ });});
+})();
+</script>
+</body>
+</html>

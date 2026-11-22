@@ -109,11 +109,17 @@ async function readJson(req) {
   const buf = await readBody(req, 64 * 1024);
   try { return JSON.parse(buf.toString('utf8') || '{}'); } catch { throw Object.assign(new Error('JSON 형식 오류'), { status: 400 }); }
 }
+// Windows 예약 장치 이름 (확장자가 붙어도 예약어다)
+const RESERVED = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(\..*)?$/i;
 function safeRel(p) {
   const s = String(p || '').replace(/\\/g, '/').replace(/^\/+/, '');
   if (!s) return null;
   const parts = s.split('/');
-  if (parts.some((x) => x === '' || x === '.' || x === '..' || /[:*?"<>|\x00-\x1f]/.test(x))) return null;
+  const bad = (x) => x === '' || x === '.' || x === '..'
+    || /[:*?"<>|\x00-\x1f]/.test(x)
+    || /[. ]$/.test(x)          // Windows 가 끝의 점·공백을 지워서 다른 이름이 된다
+    || RESERVED.test(x);
+  if (parts.some(bad)) return null;
   return parts.join('/');
 }
 function inside(base, target) {
@@ -246,7 +252,13 @@ async function handleApi(req, res, url) {
     }
     const id = m[1];
     fs.mkdirSync(REVIEWS, { recursive: true });
-    fs.renameSync(stage, path.join(REVIEWS, id));
+    try {
+      fs.renameSync(stage, path.join(REVIEWS, id));
+    } catch {
+      // Windows 에서 백신·탐색기가 폴더를 잡고 있으면 이름 바꾸기가 실패할 수 있어 복사로 대신한다
+      fs.cpSync(stage, path.join(REVIEWS, id), { recursive: true });
+      rmDir(stage);
+    }
     if (dup) {
       rmDir(path.join(REVIEWS, dup.id));
       idx.items = idx.items.filter((x) => x.id !== dup.id);
@@ -373,6 +385,11 @@ function serveStatic(res, base, rel) {
 /* ---------- 서버 ---------- */
 const server = http.createServer(async (req, res) => {
   try {
+    // Host 헤더 검사: 다른 도메인이 이 PC 의 localhost 로 연결되게 하는 DNS rebinding 을 막는다
+    const hostHeader = String(req.headers.host || '').toLowerCase();
+    if (hostHeader !== `127.0.0.1:${PORT}` && hostHeader !== `localhost:${PORT}`) {
+      return send(res, 403, 'Forbidden');
+    }
     const url = new URL(req.url, `http://${HOST}:${PORT}`);
     if (url.pathname.startsWith('/api/')) return await handleApi(req, res, url);
     if (url.pathname === '/site' ) { res.writeHead(302, { Location: '/site/' }); return res.end(); }
