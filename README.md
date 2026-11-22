@@ -1,5 +1,7 @@
 # 채점 결과 조회 사이트
 
+https://inpyung-mobile-app.github.io/GradingRegion/
+
 지방기능경기대회 모바일앱개발(Module A) 채점 결과를 **이름으로 검색**해서 보는 사이트다.
 내 결과와 다른 참가자의 결과를 한 화면에서 볼 수 있다.
 
