@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-22T22:50:16.687Z",
+  "updatedAt": "2026-11-23T09:32:40.962Z",
   "items": [
     {
       "id": "5362e3fce157",
@@ -22,6 +22,17 @@
       "objective": 24.1,
       "deduction": 5.15,
       "target": "2026-reg-lyj"
+    },
+    {
+      "id": "b24c580f6972",
+      "name": "최인성",
+      "addedAt": "2026-11-23T09:32:40.962Z",
+      "max": 35,
+      "total": 30.55,
+      "subjective": 4.75,
+      "objective": 25.8,
+      "deduction": 4.45,
+      "target": "026-reg-cis"
     }
   ]
 }
