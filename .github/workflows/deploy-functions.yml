@@ -1,11 +1,12 @@
 name: 서버 함수 배포
-# supabase/functions 아래 코드를 바꿔 main(또는 이 브랜치)에 올리면 Supabase에 배포한다. 수동 실행도 된다.
+# supabase/functions 아래 코드를 바꿔 main 또는 claude/project-thread-ind4t4 에 올리면 Supabase에 배포한다.
+# (수동 실행은 이 파일이 main에 있어야 Actions 목록에 보인다.)
 # 필요한 비밀 값: SUPABASE_ACCESS_TOKEN, SUPABASE_PROJECT_REF
 on:
   workflow_dispatch:
   push:
-    branches: [main]
-    paths: ['supabase/functions/**']
+    branches: [main, claude/project-thread-ind4t4]
+    paths: ['supabase/functions/**', '.github/workflows/deploy-functions.yml']
 
 jobs:
   deploy:
@@ -15,6 +16,12 @@ jobs:
       - uses: supabase/setup-cli@v1
         with:
           version: latest
+      - name: 비밀 값 확인
+        env:
+          T: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          R: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          if [ -z "$T" ] || [ -z "$R" ]; then echo "::error::저장소 Secrets에 SUPABASE_ACCESS_TOKEN 과 SUPABASE_PROJECT_REF 를 넣은 뒤 이 실행을 Re-run 해 주세요."; exit 1; fi
       - name: 배포
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
