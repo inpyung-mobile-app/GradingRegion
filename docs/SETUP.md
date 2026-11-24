@@ -52,7 +52,7 @@ on conflict (user_id) do update set role = excluded.role, email = excluded.email
 | --- | --- | --- |
 | 매주 백업 (`backup.yml`) | 일요일 03:00 KST | `SUPABASE_DB_URL`, `BACKUP_PASSPHRASE` |
 | 일시정지 방지 핑 (`ping.yml`) | 3일마다 | `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` |
-| 서버 함수 배포 (`deploy-functions.yml`) | 함수 코드 변경 시 / 수동 | `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` |
+| 서버 함수 배포 (`deploy-functions.yml`) | 함수 코드 변경 시 / 수동 | `SUPABASE_ACCESS_TOKEN` |
 
 백업은 암호화된 파일로 Actions 결과물에 90일 보관됩니다. 캡처 이미지와 제출 zip은 백업에 들어 있지 않습니다(결과는 다시 올릴 수 있고, zip은 14일 뒤 지워지는 임시 자료입니다).
 
