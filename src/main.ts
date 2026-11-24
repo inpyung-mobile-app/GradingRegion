@@ -35,5 +35,11 @@ setNotFound(({ root }) => {
   root.innerHTML = publicShell(null, 'none', html`<main class="wrap"><section class="panel panel-b"><h1 style="font-size:22px">페이지를 찾을 수 없습니다</h1><p><a href="/">순위표로 가기</a></p></section></main>`).value;
 });
 
+// 로그인 링크가 만료되면 Supabase가 주소 뒤에 #error=...를 붙여 사이트 첫 화면으로 보낸다. 로그인 화면에서 안내한다.
+if (location.hash.includes('error_code=')) {
+  const h = new URLSearchParams(location.hash.slice(1));
+  history.replaceState(null, '', `/admin/login?error_code=${encodeURIComponent(h.get('error_code') ?? '')}`);
+}
+
 installLinkHandler();
 void render();
