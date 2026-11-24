@@ -1,0 +1,29 @@
+name: 매주 백업
+# 일요일 03:00 KST(토요일 18:00 UTC)에 데이터베이스를 내려받아 암호화한 뒤 90일 동안 보관한다.
+# 필요한 비밀 값(저장소 Settings > Secrets and variables > Actions): SUPABASE_DB_URL, BACKUP_PASSPHRASE
+on:
+  schedule:
+    - cron: '0 18 * * 6'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 데이터베이스 내려받기
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client-16 >/dev/null
+          pg_dump "$DB_URL" --no-owner --no-privileges --schema=public --schema=auth -Fc -f backup.dump
+      - name: 암호화
+        env:
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          openssl enc -aes-256-cbc -pbkdf2 -salt -pass env:PASS -in backup.dump -out "backup-$(date -u +%F).dump.enc"
+          rm backup.dump
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backup
+          path: backup-*.dump.enc
+          retention-days: 90
