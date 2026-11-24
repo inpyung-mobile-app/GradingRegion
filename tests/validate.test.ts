@@ -138,3 +138,13 @@ describe('buildInstructionPrompt', () => {
     expect(p).toContain('module-a/');
   });
 });
+
+import { readFileSync, readdirSync } from 'node:fs';
+
+describe('Edge Function용 복사본', () => {
+  it('shared/ 와 supabase/functions/_shared/lib 이 같다(고친 뒤에는 npm run sync)', () => {
+    for (const f of readdirSync('shared').filter((f) => f.endsWith('.ts'))) {
+      expect(readFileSync(`supabase/functions/_shared/lib/${f}`, 'utf8')).toBe(readFileSync(`shared/${f}`, 'utf8'));
+    }
+  });
+});
