@@ -13,7 +13,8 @@
    ```sql
    insert into public.admins (user_id, email, role)
    select id, email, case email when '0812jinwoo@gmail.com' then 'owner' else 'editor' end
-     from auth.users where email in ('0812jinwoo@gmail.com', '321plek@gmail.com');
+     from auth.users where email in ('0812jinwoo@gmail.com', '321plek@gmail.com')
+on conflict (user_id) do update set role = excluded.role, email = excluded.email;
    ```
 
    이후 관리자 추가와 권한 변경은 사이트의 *관리자 목록* 화면(owner만)에서 합니다.
