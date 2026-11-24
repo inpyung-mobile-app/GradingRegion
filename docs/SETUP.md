@@ -25,6 +25,20 @@
    select vault.create_secret('<긴 임의 문자열>', 'cron_secret');
    ```
 
+## 1-1. 사이트용 GitHub App (제출 기능)
+
+저장소 만들기, 학생 초대, 마감 시점 커밋 기록에 씁니다. org owner가 한 번 만듭니다.
+
+1. GitHub org(inpyung-mobile-app) Settings > Developer settings > GitHub Apps > New GitHub App.
+   - Webhook은 끕니다.
+   - Repository permissions: **Administration** Read and write, **Contents** Read and write, **Metadata** Read-only.
+   - Where can this app be installed: Only on this account.
+2. 만든 뒤 *App ID* 를 적어 두고, *Generate a private key* 로 `.pem` 파일을 받습니다.
+3. 앱 페이지의 Install App으로 org에 설치합니다(모든 저장소). 설치 뒤 주소 끝의 숫자가 *Installation ID* 입니다(`.../installations/12345678`).
+4. Supabase > Edge Functions > Secrets 에 아래 네 개를 넣습니다. 키 파일은 줄바꿈이 있는 그대로 붙여 넣습니다.
+   - `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`, `GITHUB_APP_PRIVATE_KEY`
+   - `CRON_SECRET` (위 5번의 `cron_secret`과 같은 값)
+
 ## 2. Vercel
 
 1. 이 저장소를 가져와 프로젝트를 만들고 Framework는 Vite, Build Command는 `npm run build`, Output은 `dist` 로 둡니다.

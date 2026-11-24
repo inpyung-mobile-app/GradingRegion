@@ -185,3 +185,9 @@ button.shot:hover .shot-box { border-color: var(--ink); }
   .lb-ov { padding: 10px; }
   .lb-slide img, .lb-slide .ph { width: 260px; }
 }
+
+/* 이름-값 목록(제출 현황, 설정 요약) */
+.kv { margin: 0; display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 8px 16px; font-size: 15px; line-height: 1.6; }
+.kv dt { color: var(--ink2); }
+.kv dd { margin: 0; word-break: break-word; }
+@media (max-width: 560px) { .kv { grid-template-columns: minmax(0, 1fr); gap: 2px; } .kv dt { margin-top: 8px; font-size: 13px; } }
