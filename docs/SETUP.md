@@ -18,7 +18,7 @@ on conflict (user_id) do update set role = excluded.role, email = excluded.email
    ```
 
    이후 관리자 추가와 권한 변경은 사이트의 *관리자 목록* 화면(owner만)에서 합니다.
-4. **서버 함수 배포**: GitHub 저장소 Settings > Secrets and variables > Actions 에 `SUPABASE_ACCESS_TOKEN`(Supabase 계정의 Access Token)과 `SUPABASE_PROJECT_REF` 를 넣고, Actions 탭에서 *서버 함수 배포* 를 실행합니다.
+4. **서버 함수 배포**: GitHub 저장소 Settings > Secrets and variables > Actions 에 `SUPABASE_ACCESS_TOKEN`(Supabase 계정의 Access Token)을 넣고, Actions 탭에서 *서버 함수 배포* 를 실행합니다.
 5. **예약 작업(cron)**: SQL Editor에서 아래 두 줄을 먼저 실행해 비밀 값을 넣은 뒤 04 마이그레이션을 실행합니다. (제출 기능을 만든 뒤에 하면 됩니다.)
 
    ```sql
