@@ -1,12 +1,26 @@
 {
   "name": "grading-region",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "지방기능경기대회 모바일앱개발 채점 결과 조회 사이트 (관리자 PC 전용 Node 서버 + GitHub Pages 정적 배포)",
+  "type": "module",
+  "description": "기능경기 모바일앱개발 채점 결과 조회 사이트 (Vite + TypeScript, Supabase, Vercel)",
   "scripts": {
-    "start": "node server/server.js"
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.119.2"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.1"
   }
 }

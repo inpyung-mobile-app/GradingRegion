@@ -1,9 +1,8 @@
-# 관리자 비밀번호 (절대 올리지 않는다)
-admin.config.json
-
-# 업로드 임시 폴더
-.staging/
-
-node_modules/
-.DS_Store
-Thumbs.db
+node_modules
+dist
+.env
+.env.local
+.vercel
+*.log
+supabase/.temp
+supabase/.branches
